@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Live Rank Leaderboard</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #status {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        .updated {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Live Rank Leaderboard</h1>
+
+    <div id="status">
+        Connecting...
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+
+        <tbody id="leaderboard">
+        </tbody>
+    </table>
+
+    <script>
+        const socket = io();
+
+        const status = document.getElementById("status");
+        const leaderboard = document.getElementById("leaderboard");
+
+        socket.on("connect", () => {
+            status.innerHTML = "Connected to live leaderboard";
+            status.className = "updated";
+        });
+
+        socket.on("disconnect", () => {
+            status.innerHTML = "Disconnected from server";
+            status.className = "";
+        });
+
+        socket.on("leaderboard:update", (players) => {
+
+            leaderboard.innerHTML = "";
+
+            players.forEach((player) => {
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${player.rank}</td>
+                    <td>${player.playerId}</td>
+                    <td>${player.score}</td>
+                `;
+
+                leaderboard.appendChild(row);
+            });
+        });
+    </script>
+
+</body>
+
+</html>
