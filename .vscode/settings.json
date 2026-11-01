@@ -1,0 +1,7 @@
+{
+    "catClapping.enabledCommands": [
+        "*",
+        "npm",
+        "npm run dev"
+    ]
+}

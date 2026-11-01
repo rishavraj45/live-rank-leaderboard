@@ -10,23 +10,24 @@ import {
     deletePlayer,
     getPlayerCount
 } from "../controllers/leaderboardController.js";
+//route file decides which controller function should handle each api request
 
 const router = express.Router();
 
-router.post("/players", createPlayer);
+router.post("/players", createPlayer);     //create a player
 
-router.put("/players/:playerId/score", setScore);
+router.put("/players/:playerId/score", setScore);    //set the exact score
 
-router.patch("/players/:playerId/score", addScore);
+router.patch("/players/:playerId/score", addScore);     //increment the score
 
-router.get("/", getLeaderboard);
+router.get("/", getLeaderboard);         //get the leaderboard
 
-router.get("/players/:playerId/rank", getRank);
+router.get("/players/:playerId/rank", getRank);          //get one player's rank
 
-router.get("/players/:playerId/around", getAroundPlayer);
+router.get("/players/:playerId/around", getAroundPlayer);               //get nearby players
 
-router.delete("/players/:playerId", deletePlayer);
+router.delete("/players/:playerId", deletePlayer);             //delete a player
 
-router.get("/stats/count", getPlayerCount);
+router.get("/stats/count", getPlayerCount);              //get total players
 
 export default router;

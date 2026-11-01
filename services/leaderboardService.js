@@ -1,9 +1,21 @@
+// this file contains the leaderboard's main logic. It uses redis sorted sets.
+// A redis sorted set stores unique members with numeric scores and keeps them ordered by score.
+
 import redis from "../config/redis.js";
 
-const LEADERBOARD_KEY = "leaderboard";
+const LEADERBOARD_KEY = "leaderboard";        //leaderboard is the actual redis key name. Redis uses this name to identify the data structure. 
 
 export const addPlayer = async (playerId, score = 0) => {
+    // it stores "playerId" in the redis sorted set named "leaderboard", with a score of "score".
     await redis.zadd(LEADERBOARD_KEY, score, playerId);
+
+    /*
+    Think of it like this:-
+    Redis key: "leaderboard"
+    ├── alice  → 500
+    ├── rishav → 400
+    └── john   → 100 
+    */
 
     return {
         playerId,
@@ -128,3 +140,17 @@ export const removePlayer = async (playerId) => {
 export const getTotalPlayers = async () => {
     return await redis.zcard(LEADERBOARD_KEY);
 };
+
+
+
+/*
+ZADD      - add a player or set their score
+ZINCRBY   - increase a player's score
+ZREVRANGE - get players from highest score to lowest
+ZREVRANK  - get a player's position in descending order
+ZSCORE    - get a player's score
+ZREM      - remove a player
+ZCARD     - count players
+
+ZINCRBY is used for score increments. Redis performs the increment atomically, so two concurrent increments won't overwrite each other.
+*/

@@ -8,6 +8,7 @@ import {
     removePlayer,
     getTotalPlayers
 } from "../services/leaderboardService.js";
+//controller receives the request, calls the service, and sends a response to the client.
 
 import { broadcastLeaderboard } from "../socket.js";
 
@@ -21,6 +22,7 @@ export const createPlayer = async (req, res) => {
             });
         }
 
+        // call this redis service
         const result = await addPlayer(
             playerId,
             score || 0
@@ -70,8 +72,8 @@ export const setScore = async (req, res) => {
 
 export const addScore = async (req, res) => {
     try {
-        const { playerId } = req.params;
-        const { amount } = req.body;
+        const { playerId } = req.params;       // read the player ID from URL
+        const { amount } = req.body;          // read the increment amount from json body
 
         if (amount === undefined) {
             return res.status(400).json({
@@ -79,13 +81,17 @@ export const addScore = async (req, res) => {
             });
         }
 
+        // controller doesn't directly perform redis commands. That work belongs to the service.
+        //ask the service to update the score in redis
         const result = await incrementScore(
             playerId,
             amount
         );
 
+        // broadcast the updated leaderboard to connected browsers
         await broadcastLeaderboard();
 
+        // send the API response back to postman
         res.json({
             success: true,
             player: result
@@ -97,12 +103,22 @@ export const addScore = async (req, res) => {
     }
 };
 
+
+// fetch the leaderboard
+// export const getLeaderboard :- makes this function available to the routes file
+// async :- allows us to use await for asynchronous operations
+// req :- contains the incoming request details
+// res :- used to send the response back to client
 export const getLeaderboard = async (req, res) => {
     try {
-        const limit = Number(req.query.limit) || 10;
+        const limit = Number(req.query.limit ?? 10);         //reads the limit query parameter from req ( GET /api/leaderboard?limit=5 ), if no limit is provided, it defaults to 10
 
+        // with validation middleware, invalid values like limit=500 should be rejected before reaching to controller
+        // await means the controller waits for redis to return the result before continuing
         const leaderboard = await getTopPlayers(limit);
 
+
+        // sends the result back as JSON
         res.json({
             success: true,
             leaderboard
