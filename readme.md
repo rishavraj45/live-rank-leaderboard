@@ -120,3 +120,11 @@ Player Score Update
 8. Each browser tab receives the event and updates its table.
 9. The controller sends the JSON response to Postman.
 That is the core architecture: routes direct requests, controllers coordinate, services handle Redis, and Socket.IO pushes changes to connected browsers.
+
+
+```
+Postman / Browser ---> http request to server.js ---> leaderboardRoutes.js ---> leaderboardController.js ---> leaderboardService.js ---> Redis.
+
+For live updates, Socket.IO
+    score changes in Redis ---> broadcastLeaderboard() ---> Socket.IO sends leaderboard:update ---> all connected browser tabs update
+```
