@@ -106,3 +106,17 @@ Player Score Update
         +---------------> Browser 3
 
 - All connected clients receive the updated leaderboard immediately without requiring a page refresh.
+```
+
+## The request flows like this:
+  ```Example of increment score```
+1. server.js receives the HTTP request.
+2. leaderboardRoutes.js matches the PATCH route.
+3. Validation middleware checks the player ID and amount.
+4. leaderboardController.js calls incrementScore().
+5. leaderboardService.js runs Redis ZINCRBY.
+6. The controller calls broadcastLeaderboard().
+7. socket.js broadcasts leaderboard:update.
+8. Each browser tab receives the event and updates its table.
+9. The controller sends the JSON response to Postman.
+That is the core architecture: routes direct requests, controllers coordinate, services handle Redis, and Socket.IO pushes changes to connected browsers.
